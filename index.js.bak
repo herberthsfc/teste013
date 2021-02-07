@@ -790,9 +790,8 @@ case 'lofi':
 					premium = args[0]
 					reply(`Perintah Diterima menambah User Premium : ${premium}`)
 					break
-					case 'play':
-					if (!isPremium) return reply('Anda bukan Member Premium, silakan hubungi owner atau ketik *#daftarvip* untuk membeli akses Premium!' ,text, { quoted: mek })
-					me = client.user
+					case 'play':   
+	        if (!isPrem) return reply(mess.only.premium)
                 reply(mess.wait)
                 play = body.slice(5)
                 anu = await fetchJson(`https://api.zeks.xyz/api/ytplaymp3?q=${play}&apikey=apivinz`)
@@ -828,8 +827,7 @@ case 'lofi':
                                         await limitAdd(sender)
 					break
 					case 'blowjob':
-					if (!isPremium) return reply('Anda bukan Member Premium, silakan hubungi owner atau ketik *#daftarvip* untuk membeli akses Premium!' ,text, { quoted: mek })
-					me = client.user
+					if (!isPrem) return reply(mess.only.premium)
 					ranp = getRandom('.gif')
 					rano = getRandom('.webp')
 					anu = await fetchJson('https://tobz-api.herokuapp.com/api/nsfwblowjob?apikey=BotWeA', {method: 'get'})
