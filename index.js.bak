@@ -221,7 +221,7 @@ client.on('group-participants-update', async (anu) => {
 					client.sendMessage(from, help(prefix), text)
 					break
 					case 'menupremium':
-		      if (!isGroupAdmins) return reply(mess.only.admin)
+		      if (!isPremium) return reply('Disponível apenas para Membros Premium!' ,text, { quoted: mek })
 		      client.sendMessage(from, menupremium(prefix, sender), text, {quoted: mek})
 				  break
 					case 'menu':
