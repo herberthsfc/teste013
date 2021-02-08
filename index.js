@@ -24,12 +24,9 @@ const { menupremium } = require('./lib/menupremium')
 const { serpremium } = require('./lib/serpremium')
 const { gcpf } = require('./src/gcpf')
 const { idiomas } = require('./lib/idiomas')
-const { cekvip } = require('./src/cekvip')
-const { daftarvip } = require('./src/daftarvip')
 const { donasi } = require('./lib/donasi')
 const { fetchJson } = require('./lib/fetcher')
 const { recognize } = require('./lib/ocr')
-const { daftatvip } = require('./src/daftarvip')
 const kagApi = require('@kagchi/kag-api')
 const { wait, simih, getBuffer, h2k, generateMessageID, getGroupAdmins, getRandom, banner, start, info, success, close } = require('./lib/functions')
 const tiktod = require('tiktok-scraper')
@@ -37,6 +34,7 @@ const ffmpeg = require('fluent-ffmpeg')
 const { removeBackgroundFromImageFile } = require('remove.bg')
 const welkom = JSON.parse(fs.readFileSync('./src/welkom.json'))
 const nsfw = JSON.parse(fs.readFileSync('./src/nsfw.json'))
+const userpremium = JSON.parse(fs.readFileSync('./src/premium.json'))
 const samih = JSON.parse(fs.readFileSync('./src/simi.json'))
 const vcard = 'BEGIN:VCARD\n' 
             + 'VERSION:3.0\n' 
@@ -170,15 +168,15 @@ client.on('group-participants-update', async (anu) => {
 					group: '*「 ❗ 」 Comando disponível apenas em grupos!*',
 					ownerG: '*「 💎 」 Comando disponível apenas para o grupo proprietário!*',
 					ownerB: '*「 💎 」 Comando disponível apenas para o Herberth!*',
+					premium: '*「 💎Comando disponível apenas para Membros Premium, para se tornar um, digite ${prefix}serpremium 」*',
 					admin: '*「 💎 」 Comando disponível apenas para Membros Premium ou Adms do grupo!*',
-					premium: '「 💎 Este comando, só pode ser usado por Membros Premium! 」',
 					Badmin: '*「 ❗ 」 O Bot precisa de adm para cumprir as funções!*'
 				}
 			}
 
 			const botNumber = client.user.jid
 			const ownerNumber = ["5511996237647@s.whatsapp.net"]
-			const premium = ["5511996237647@s.whatsapp.net","551pakeknomorkaunjieer@s.whatsapp.net","5511996237647@s.whatsapp.net"]
+			const premium = ["5511996237647@s.whatsapp.net","551pakeknomorkaunjieer@s.whatsapp.net","5511996237647@s.whatsapp.net"] 
 			const isGroup = from.endsWith('@g.us')
 			const sender = isGroup ? mek.participant : mek.key.remoteJid
 			const groupMetadata = isGroup ? await client.groupMetadata(from) : ''
@@ -193,7 +191,7 @@ client.on('group-participants-update', async (anu) => {
 			const isNsfw = isGroup ? nsfw.includes(from) : false
 			const isSimi = isGroup ? samih.includes(from) : false
 			const isOwner = ownerNumber.includes(sender)
-			const isPremium = premium.includes(sender)
+			const isPrem = userpremium.includes(sender)
 			const isUrl = (url) => {
 			    return url.match(new RegExp(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/, 'gi'))
 			}
@@ -255,31 +253,6 @@ client.on('group-participants-update', async (anu) => {
 					}
 					teks += `total : ${blocked.length}`
 					client.sendMessage(from, teks.trim(), extendedText, {quoted: mek, contextInfo: {"mentionedJid": blocked}})
-					break
-					case 'premiumlist':
-					client.updatePresence(from, Presence.composing) 
-					if (!isGroup) return reply(mess.only.group)
-					teks = `╭─「 *TOTAL USER PREMIUM ${name}* 」\n`
-					no = 0
-					for (let prem of userpremium) {
-						no += 1
-						teks += `[${no.toString()}] @${prem.split('@')[0]}\n`
-					}
-					teks += `│+ Total User Premium : ${userpremium.length}\n╰──────⎿ *${name}* ⏋────`
-					client.sendMessage(from, teks.trim(), extendedText, {quoted: mek, contextInfo: {"mentionedJid": userpremium}})
-					break
-					case 'cekvip':
-					if (isBanned) return reply(mess.only.benned)    
-					if (!isUser) return reply(mess.only.userB)
-					if (!isPremium) return reply('Anda bukan Member Premium, silakan hubungi owner atau ketik *#daftarvip* untuk membeli akses Premium!' ,text, { quoted: mek })
-					me = client.user
-					uptime = process.uptime()
-					client.sendMessage(from,  `*──────────────────*\n*Nama bot:* *${me.name}*\n*─────────────────*\n『 *𝐕𝐈𝐏 𝐔𝐒𝐄𝐑*』\n*──────────────────*\n*•Nomor:* *${sender.split("@s.whatsapp.net")[0]}*\n*•Status:* *ACTIVE*\n*──────────────────*\n*Status Bot:* *${kyun(uptime)}*\n*──────────────────*` , text, { quoted: mek, })
-					break
-				case 'daftarvip':
-					if (isBanned) return reply(mess.only.benned)    
-					if (!isUser) return reply(mess.only.userB)
-					client.sendMessage(from, daftarvip(prefix) , text, { quoted: mek })
 					break
 					case 'delete':
 				case 'del':
@@ -717,82 +690,8 @@ case 'lofi':
 						reply('*「 ✔️ 」 Sucesso!*')
 					}
 					break
-					case 'addvip':
-					if (isBanned) return reply(mess.only.benned)    
-					if (!isUser) return reply(mess.only.userB)
-					if (!isPremium) return reply('Anda bukan Member Premium, silakan hubungi owner atau ketik *#daftarvip* untuk membeli akses Premium!' ,text, { quoted: mek })
-					if (mek.message.extendedTextMessage === undefined || mek.message.extendedTextMessage === null) return reply('Tag target yang ingin di tendang!')
-					mentioned = mek.message.extendedTextMessage.contextInfo.mentionedJid
-					mentioned = mek.message.extendedTextMessage.contextInfo.mentionedJid
-					if (mentioned.length > 1) {
-						teks = '╭────「 *PREMIUM👑* 」──*\n│+ *Number* : \n│+ *Expired*: *30 Days*\n│+ *Status*: *ACTIVE*\n│ Thx for Upgrade to Premium🥰\n*╰──────「 *EREN* 」────'
-						for (let _ of mentioned) {
-							teks += `@${_.split('@')[0]}\n`
-						}
-						mentions(teks, mentioned, true)
-						client.sendMessage(from, mentioned)
-					} else {
-						mentions(`╭────「 *PREMIUM👑* 」──*\n│+ *Number* : @${mentioned[0].split('@')[0]}\n│+ *Expired*: *30 Days*\n│+ *Status*: *ACTIVE*\n│ Thx for Upgrade to Premium🥰\n*╰──────「 *EREN* 」────`, mentioned, true)
-					client.sendMessage(from, mentioned)
-				    }
-					break
-					case 'dellvip':
-					if (isBanned) return reply(mess.only.benned)    
-					if (!isUser) return reply(mess.only.userB)
-					if (!isPremium) return reply('Anda bukan Member Premium, silakan hubungi owner atau ketik *#daftarvip* untuk membeli akses Premium!' ,text, { quoted: mek })
-					if (mek.message.extendedTextMessage === undefined || mek.message.extendedTextMessage === null) return reply('Tag target yang ingin di tendang!')
-					mentioned = mek.message.extendedTextMessage.contextInfo.mentionedJid
-					mentioned = mek.message.extendedTextMessage.contextInfo.mentionedJid
-					if (mentioned.length > 1) {
-						teks = '╭────「 *PREMIUM👑* 」──*\n│+ *Number* : \n│+ *Status*: *DEACTIVE*\n│ See u for next order🙂\n*╰──────「 *EREN* 」────'
-						for (let _ of mentioned) {
-							teks += `@${_.split('@')[0]}\n`
-						}
-						mentions(teks, mentioned, true)
-						client.sendMessage(from, mentioned)
-					} else {
-						mentions(`╭────「 *PREMIUM👑* 」──*\n│+ *Number* : @${mentioned[0].split('@')[0]}\n│+ *Status*: *DEACTIVE*\n│ See u for next order🙂\n*╰──────「 *EREN* 」────`, mentioned, true)
-					client.sendMessage(from, mentioned)
-				    }
-					break
-					case 'erenadmin':
-					if (isBanned) return reply(mess.only.benned)    
-					if (!isUser) return reply(mess.only.userB)
-					tod = await getBuffer(`https://i.ibb.co/XDwBVDJ/1f2652c622fa.jpg`)
-					client.sendMessage(from, tod, image, { quoted: mek, caption: '*╭────*「 *ADMINBOT EREN ✨* 」\n*│+wa.me/6281368646011*╰──────*「 *EREN* 」*────*\n\n*_JIKA INGIN MENJADI ADMIN  EREN BOT_*\n*_Ketik /iklan_*' })
-					break
-					case 'premiumcek':
-					if (isBanned) return reply(mess.only.benned)    
-					if (!isUser) return reply(mess.only.userB)
-					sa = await getBuffer(`https://i.ibb.co/PcQ6tsB/79ac87b9358c.jpg`)
-					client.sendMessage(from, sa, image, { quoted: mek, caption: '*╭────*「 *PREMIUM USER👑* 」\n*│+ wa.me/6281368646011*╰──────*「 *EREN* 」*────*\n\n*_JIKA INGIN MENJADI PREMIUM USER  EREN BOT_*\n*_Ketik #daftarvip*' })
-					break
-					case 'cekmod': 
-					if (!isUser) return reply(mess.only.userB)
-					if (isBanned) return reply(mess.only.benned)  
-                 if (!ismod) return reply('kamu Belum Terdaftar sebagai User Modbot')
-                reply('kamu udah ke daftar sebagai user Modbot')
-                break
-                    case 'modbotlist':
-					teks = 'This is list of user premium :\n'
-					for (let p of mod) {
-						teks += `~> @${p.split('@')[0]}\n`
-					}
-					teks += `Total : ${mod.length}`
-					client.sendMessage(from, teks.trim(), extendedText, {quoted: mek, contextInfo: {"mentionedJid": mod}})
-					break
-					case 'addpremium':
-					if (isBanned) return reply(mess.only.benned)    
-					client.updatePresence(from, Presence.composing) 
-					if (!isUser) return reply(mess.only.userB)
-					if (args.length < 1) return
-					if (!isOwner) return reply(mess.only.ownerB)
-					premium = args[0]
-					reply(`Perintah Diterima menambah User Premium : ${premium}`)
-					break
-					case 'play':
-					if (!isPremium) return reply('Anda bukan Member Premium, silakan hubungi owner atau ketik *#daftarvip* untuk membeli akses Premium!' ,text, { quoted: mek })
-					me = client.user
+					case 'play':   
+	        if (!isGroupAdmins) return reply(mess.only.admin)
                 reply(mess.wait)
                 play = body.slice(5)
                 anu = await fetchJson(`https://api.zeks.xyz/api/ytplaymp3?q=${play}&apikey=apivinz`)
@@ -828,8 +727,7 @@ case 'lofi':
                                         await limitAdd(sender)
 					break
 					case 'blowjob':
-					if (!isPremium) return reply('Anda bukan Member Premium, silakan hubungi owner atau ketik *#daftarvip* untuk membeli akses Premium!' ,text, { quoted: mek })
-					me = client.user
+					if (!isPrem) return reply(mess.only.premium)
 					ranp = getRandom('.gif')
 					rano = getRandom('.webp')
 					anu = await fetchJson('https://tobz-api.herokuapp.com/api/nsfwblowjob?apikey=BotWeA', {method: 'get'})
@@ -975,6 +873,34 @@ case 'lofi':
 						mentions(`*「 ✔️ 」 SE FODEU! @${mentioned[0].split('@')[0]} Removido(a) com sucesso!*`, mentioned, true)
 						client.groupRemove(from, mentioned)
 					}
+					break
+					case 'premiumlist':
+					client.updatePresence(from, Presence.composing) 
+					if (!isUser) return reply(mess.only.userB)
+					teks = `╭─「 *TOTAL USER PREMIUM ${name}* 」\n`
+					no = 0
+					for (let prem of userpremium) {
+						no += 1
+						teks += `[${no.toString()}] @${prem.split('@')[0]}\n`
+					}
+					teks += `│+ Total User Premium : ${userpremium.length}\n╰──────⎿ *${name}* ⏋────`
+					client.sendMessage(from, teks.trim(), extendedText, {quoted: mek, contextInfo: {"mentionedJid": userpremium}})
+					break
+					case 'addprem':
+					client.updatePresence(from, Presence.composing)
+					if (args.length < 1) return
+					if (!isOwner) return reply(mess.only.ownerB)
+					addpremium = `${body.slice(9)}@.whatsapp.net`
+					userpremium.push(addpremium)
+					fs.writeFileSync('./database/json/premium.json', JSON.stringify(userpremium))
+					reply(`*Berhasil Menambahkan ${addpremium} Ke database User Premium*`)
+					break
+				case 'removeprem':
+					if (!isOwner) return reply(mess.only.ownerB)
+					rprem = body.slice(13)
+					userpremium.splice(`${rprem}@s.whatsapp.net`, 1)
+					fs.writeFileSync('./database/json/premium.json', JSON.stringify(userpremium))
+					reply(`Berhasil Remove wa.me/${rprem} Dari User Premium`)
 					break
 					case 'linkgrup':
 				case 'linkgp':
